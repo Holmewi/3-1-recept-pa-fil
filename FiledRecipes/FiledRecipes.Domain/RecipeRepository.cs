@@ -138,20 +138,24 @@ namespace FiledRecipes.Domain
             // Sätter den uppräkningsbara typens status till odefinierad
             RecipeReadStatus status = RecipeReadStatus.Indefinite;
 
+            
+
             // Öppnar filen med recept och listar hela textfilen
             try
             {
                 using (StreamReader reader = new StreamReader(@"App_Data/Recipes.txt"))
                 {
+                    // Variabel som ska hantera rader i textdokumentet
                     string line;
 
-                    while ((line = reader.ReadLine()) != null)
+                    while ((line = reader.ReadLine()) != null)  // Så länge dokumentet inte är slut eller tomt
                     {
 
                         if (line == "")     // Om raden är tom
                         {
                             continue;
                         }
+
                         /*
                         if (line == SectionRecipe)  // Om det finns en section med recept
                         {
@@ -183,29 +187,33 @@ namespace FiledRecipes.Domain
                         }
                         */
                         
-                        
+                        // Går i genom rad för rad för att dela upp sektioner
                         switch (line)
                         {
-                            case SectionRecipe:
+                            case SectionRecipe:     // Om det finns en section med recept
                                 status = RecipeReadStatus.New;
                                 continue;
-                            case SectionIngredients:
+                            case SectionIngredients:        // Om det finns en section med ingredienser
                                 Console.WriteLine("Ingredienser");  // Tillfällig rubrik
                                 Console.BackgroundColor = ConsoleColor.Green;  // Testing
                                 status = RecipeReadStatus.Ingredient;
-                                continue;        
-                            case SectionInstructions:
+                                continue;
+                            case SectionInstructions:       // Om det finns en section med instructioner
                                 Console.ResetColor(); // Testing
                                 Console.WriteLine("Instruktioner");  // Tillfällig rubrik
                                 status = RecipeReadStatus.Instruction;
                                 continue;
                         }
 
+                        // Skapar ett nytt object från den icke abstrakta klassen som hanterar recept
+                        Recipe recipe = new Recipe(line);
+
+                        // Går i genom och modifierar statustyperne för recept, ingredienser och instruktioner
                         switch (status)
                         {
-                            case RecipeReadStatus.New:
-                                Console.WriteLine("   TEST RECEPT");
-                                continue;
+                            case RecipeReadStatus.New: 
+                                recipeList.Add(recipe);     // Lägger till dokumentets rader för den uppräkningsbara typen "New"
+                                break;
                             case RecipeReadStatus.Ingredient:
                                 Console.WriteLine("   TEST INGREDIENS");
                                 continue;
