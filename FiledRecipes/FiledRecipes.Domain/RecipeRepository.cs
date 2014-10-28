@@ -128,11 +128,30 @@ namespace FiledRecipes.Domain
             }
         }
 
+        // Virtual används för att modifiera metoden från det ärvda interfacet
+        // Hämta recept
         public virtual void Load()
         {
-            throw new NotImplementedException();
+            try
+            {
+                using (StreamReader reader = new StreamReader(@"App_Data/Recipes.txt"))
+                {
+                    string line = null;
+
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        Console.WriteLine(line);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("FEL!\n{0} ", ex.Message);
+            }
         }
 
+        // Spara recept
         public virtual void Save()
         {
             throw new NotImplementedException();
