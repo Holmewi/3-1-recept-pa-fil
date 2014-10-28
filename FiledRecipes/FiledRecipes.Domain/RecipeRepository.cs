@@ -143,15 +143,47 @@ namespace FiledRecipes.Domain
             {
                 using (StreamReader reader = new StreamReader(@"App_Data/Recipes.txt"))
                 {
-                    string line = null;
+                    string line;
 
                     while ((line = reader.ReadLine()) != null)
                     {
-                        // Fortsätt om raden är tom
-                        if (line == "")
+
+                        if (line == "")     // Om raden är tom
                         {
                             continue;
                         }
+                        /*
+                        if (line == SectionRecipe)  // Om det finns en section med recept
+                        {
+                            status = RecipeReadStatus.New;
+                        }
+                        else if (line == SectionIngredients)    // Om det finns en section med ingredienser
+                        {
+                            status = RecipeReadStatus.Ingredient;
+                        }
+                        else if (line == SectionInstructions)   // Om det finns en section med instructioner
+                        {
+                            status = RecipeReadStatus.Instruction;
+                        }
+                        // Annars om det är en sträng innanför en section
+                        else
+                        {
+                            if (status == RecipeReadStatus.New)
+                            {
+                                Console.WriteLine("   TEST RECEPT");
+                            }
+                            else if (status == RecipeReadStatus.Ingredient)
+                            {
+                                Console.WriteLine("   TEST INGREDIENS");
+                            }
+                            else if (status == RecipeReadStatus.Instruction)
+                            {
+                                Console.WriteLine("   TEST INSTRUKTION");
+                            }
+                        }
+                        */
+                        
+                        
                         switch (line)
                         {
                             case SectionRecipe:
@@ -166,6 +198,19 @@ namespace FiledRecipes.Domain
                                 Console.ResetColor(); // Testing
                                 Console.WriteLine("Instruktioner");  // Tillfällig rubrik
                                 status = RecipeReadStatus.Instruction;
+                                continue;
+                        }
+
+                        switch (status)
+                        {
+                            case RecipeReadStatus.New:
+                                Console.WriteLine("   TEST RECEPT");
+                                continue;
+                            case RecipeReadStatus.Ingredient:
+                                Console.WriteLine("   TEST INGREDIENS");
+                                continue;
+                            case RecipeReadStatus.Instruction:
+                                Console.WriteLine("   TEST INSTRUKTION");
                                 continue;
                         }
                         Console.WriteLine(line);
