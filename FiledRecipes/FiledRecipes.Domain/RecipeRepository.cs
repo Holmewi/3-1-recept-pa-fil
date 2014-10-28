@@ -132,11 +132,15 @@ namespace FiledRecipes.Domain
         // Hämta recept
         public virtual void Load()
         {
+            // Skapar en lista med referenser till receptobjektet
+            List<IRecipe> recipeList = new List<IRecipe>();
+
+            // Öppnar filen med recept och listar hela textfilen
             try
             {
                 using (StreamReader reader = new StreamReader(@"App_Data/Recipes.txt"))
                 {
-                    string line = null;
+                    string line;
 
                     while ((line = reader.ReadLine()) != null)
                     {
