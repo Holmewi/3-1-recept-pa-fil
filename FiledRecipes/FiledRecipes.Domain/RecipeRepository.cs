@@ -244,7 +244,10 @@ namespace FiledRecipes.Domain
                             case RecipeReadStatus.Indefinite:               // 3.e.iv Kasta ett undantag om något är fel
                                 throw new FileFormatException();
                         }
-                        
+
+                        recipeList.OrderBy(recipeNameOrder => recipeNameOrder.Name).ToList();      // 4. Ska sortera listan efter receptens namn
+                        //IEnumerable<Recipe> recipeOrder = recipeList.OrderBy(recipeNameOrder => recipeNameOrder.Name).ToList();
+
 
                         Console.WriteLine(line);
                          
