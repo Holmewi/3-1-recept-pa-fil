@@ -245,9 +245,12 @@ namespace FiledRecipes.Domain
                                 throw new FileFormatException();
                         }
 
-                        recipeList.OrderBy(recipeNameOrder => recipeNameOrder.Name).ToList();      // 4. Ska sortera listan efter receptens namn
-                        //IEnumerable<Recipe> recipeOrder = recipeList.OrderBy(recipeNameOrder => recipeNameOrder.Name).ToList();
-
+                                                                        // 4 & (5). Ska sortera listan efter receptens namn (Två alternativ)
+                        //_recipes = recipeList.OrderBy(recipeNameOrder => recipeNameOrder.Name).ToList();      
+                        IEnumerable<IRecipe> recipeOrder = recipeList.OrderBy(recipeNameOrder => recipeNameOrder.Name).ToList();
+                        _recipes = new List<IRecipe>(recipeOrder);      // 5. Tilldelar _recipes en referens till den sorterade listan
+                        IsModified = false;                             // 6. Visar klassen att listan är oförändrad
+                        OnRecipesChanged(EventArgs.Empty);              // 7. Utlöser en händelse om receptet har lästs in
 
                         Console.WriteLine(line);
                          
