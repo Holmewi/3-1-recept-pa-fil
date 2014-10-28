@@ -135,15 +135,39 @@ namespace FiledRecipes.Domain
             // Skapar en lista med referenser till receptobjektet
             List<IRecipe> recipeList = new List<IRecipe>();
 
+            // Sätter den uppräkningsbara typens status till odefinierad
+            RecipeReadStatus status = RecipeReadStatus.Indefinite;
+
             // Öppnar filen med recept och listar hela textfilen
             try
             {
                 using (StreamReader reader = new StreamReader(@"App_Data/Recipes.txt"))
                 {
-                    string line;
+                    string line = null;
 
                     while ((line = reader.ReadLine()) != null)
                     {
+                        // Fortsätt om raden är tom
+                        if (line == "")
+                        {
+                            continue;
+                        }
+                        switch (line)
+                        {
+                            case SectionRecipe:
+                                status = RecipeReadStatus.New;
+                                continue;
+                            case SectionIngredients:
+                                Console.WriteLine("Ingredienser");  // Tillfällig rubrik
+                                Console.BackgroundColor = ConsoleColor.Green;  // Testing
+                                status = RecipeReadStatus.Ingredient;
+                                continue;        
+                            case SectionInstructions:
+                                Console.ResetColor(); // Testing
+                                Console.WriteLine("Instruktioner");  // Tillfällig rubrik
+                                status = RecipeReadStatus.Instruction;
+                                continue;
+                        }
                         Console.WriteLine(line);
                     }
                 }
