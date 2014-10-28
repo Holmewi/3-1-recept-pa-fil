@@ -195,7 +195,8 @@ namespace FiledRecipes.Domain
                                 continue;
                             case SectionIngredients:        // Om det finns en section med ingredienser
                                 Console.WriteLine("Ingredienser");  // Tillfällig rubrik
-                                Console.BackgroundColor = ConsoleColor.Green;  // Testing
+                                Console.BackgroundColor = ConsoleColor.DarkBlue;  // Testing
+                                Console.ForegroundColor = ConsoleColor.White;
                                 status = RecipeReadStatus.Ingredient;
                                 continue;
                             case SectionInstructions:       // Om det finns en section med instructioner
@@ -215,8 +216,16 @@ namespace FiledRecipes.Domain
                                 recipeList.Add(recipe);     // Lägger till dokumentets rader för den uppräkningsbara typen "New"
                                 break;
                             case RecipeReadStatus.Ingredient:
-                                Console.WriteLine("   TEST INGREDIENS");
-                                continue;
+                                string[] split = line.Split(new char[] { ';' }, StringSplitOptions.None);
+                                foreach (string value in split)
+                                {
+                                    recipeList.Add(recipe);     // Lägger till dokumentets rader för den uppräkningsbara typen "Ingredient"
+                                }
+                                if(split.Length > 3)
+                                {
+                                    throw new FileFormatException();
+                                }
+                                break;
                             case RecipeReadStatus.Instruction:
                                 Console.WriteLine("   TEST INSTRUKTION");
                                 continue;
