@@ -130,14 +130,14 @@ namespace FiledRecipes.Domain
 
         // Virtual används för att modifiera metoden från det ärvda interfacet
         // Hämta recept
-        public virtual void Load()
+        public void Load()
         {
             // 1. Skapar en lista med referenser till receptobjektet
             List<IRecipe> recipeList = new List<IRecipe>();
 
             // Sätter den uppräkningsbara typens status till odefinierad
             RecipeReadStatus status = RecipeReadStatus.Indefinite;
-
+            Recipe recipe = null;
             
 
             // 2. Öppnar filen med recept och listar hela textfilen
@@ -151,52 +151,56 @@ namespace FiledRecipes.Domain
                     while ((line = reader.ReadLine()) != null)  // Så länge dokumentet inte är slut eller tomt
                     {
 
-                        if (line == "")     // 3.a. Om raden är tom
+                        if (line != "")     // 3.a. Om raden är tom
                         {
-                            continue;
+                            if (line == SectionRecipe)  // Om det finns en section med recept
+                            {
+                                status = RecipeReadStatus.New;
+                            }
+                            else if (line == SectionIngredients)    // Om det finns en section med ingredienser
+                            {
+                                status = RecipeReadStatus.Ingredient;
+                            }
+                            else if (line == SectionInstructions)   // Om det finns en section med instructioner
+                            {
+                                status = RecipeReadStatus.Instruction;
+                            }
+                            // Annars om det är en sträng innanför en section
+                            else
+                            {
+
+                                switch (status)
+                                {
+                                    case RecipeReadStatus.New:                      // 3.e.i Statusen är satt till receptets namn
+                                        recipe = new Recipe(line);
+                                        recipeList.Add(recipe);                     // 3.e.i.1. Lägger till dokumentets rader för den uppräkningsbara typen "New"
+                                        break;
+                                    case RecipeReadStatus.Ingredient:               // 3.e.ii Statusen är satt till receptets ingredienser
+                                        string[] split = line.Split(new string[] { ";" }, StringSplitOptions.None);          // 3.e.ii.1 Delar upp raden i delar
+                                        if (split.Length > 3)                       // 3.e.ii.2 Skicka exception om det finns fler delar än tre
+                                        {
+                                            throw new FileFormatException();
+                                        }
+                                        Ingredient ingredient = new Ingredient();   // 3.e.ii.3 Skapa ett ingrediensobjekt och initera det med tre delar
+                                        ingredient.Amount = split[0];
+                                        ingredient.Measure = split[1];
+                                        ingredient.Name = split[2];
+                                        recipe.Add(ingredient);                     // 3.e.ii.4 Lägger till dokumentets rader från den uppräkningsbara typen "Ingredient"
+                                        break;
+                                    case RecipeReadStatus.Instruction:              // 3.e.iii Statusen är satt till receptets instruktioner
+                                        recipe.Add(line);                     // 3.e.iii.1 Lägger till rader för den uppräkningsbara typen "Instruction"
+                                        break;
+                                    case RecipeReadStatus.Indefinite:               // 3.e.iv Kasta ett undantag om något är fel
+                                        throw new FileFormatException();
+                                }
+                            }
                         }
+
+                        
+                        
+                        
 
                         /*
-                        if (line == SectionRecipe)  // Om det finns en section med recept
-                        {
-                            status = RecipeReadStatus.New;
-                        }
-                        else if (line == SectionIngredients)    // Om det finns en section med ingredienser
-                        {
-                            status = RecipeReadStatus.Ingredient;
-                        }
-                        else if (line == SectionInstructions)   // Om det finns en section med instructioner
-                        {
-                            status = RecipeReadStatus.Instruction;
-                        }
-                        // Annars om det är en sträng innanför en section
-                        else
-                        {
-                            Recipe recipe = new Recipe(line);
-                            if (status == RecipeReadStatus.New)
-                            {
-                                recipeList.Add(recipe);
-                            }
-                            else if (status == RecipeReadStatus.Ingredient)
-                            {
-                                string[] split = line.Split(new char[] { ';' }, StringSplitOptions.None);
-                                foreach (string value in split)
-                                {
-                                    recipeList.Add(recipe);     // Lägger till dokumentets rader för den uppräkningsbara typen "Ingredient"
-                                }
-                                if (split.Length > 3)
-                                {
-                                    throw new FileFormatException();
-                                }
-                            }
-                            else if (status == RecipeReadStatus.Instruction)
-                            {
-                                recipeList.Add(recipe);
-                            }
-                        }
-                        */
-
-
                         // Går i genom rad för rad för att dela upp sektioner
                         switch (line)
                         {
@@ -204,20 +208,16 @@ namespace FiledRecipes.Domain
                                 status = RecipeReadStatus.New;
                                 continue;
                             case SectionIngredients:        // 3.c. Om det finns en section med ingredienser
-                                Console.WriteLine("Ingredienser");  // Tillfällig rubrik
-                                Console.BackgroundColor = ConsoleColor.DarkBlue;  // Testing
-                                Console.ForegroundColor = ConsoleColor.White;
                                 status = RecipeReadStatus.Ingredient;
                                 continue;
                             case SectionInstructions:       // 3.d. Om det finns en section med instructioner
-                                Console.ResetColor(); // Testing
-                                Console.WriteLine("Instruktioner");  // Tillfällig rubrik
                                 status = RecipeReadStatus.Instruction;
                                 continue;
                         }
+                        
 
                         // Skapar ett nytt object från den icke abstrakta klassen som hanterar recept
-                        Recipe recipe = new Recipe(line);
+                        //Recipe recipe = new Recipe(line);
 
                         // 3.e. Går i genom och modifierar statustyperne för recept, ingredienser och instruktioner
                         switch (status)
@@ -244,15 +244,21 @@ namespace FiledRecipes.Domain
                             case RecipeReadStatus.Indefinite:               // 3.e.iv Kasta ett undantag om något är fel
                                 throw new FileFormatException();
                         }
+                        */
 
-                                                                        // 4 & (5). Ska sortera listan efter receptens namn (Två alternativ)
-                        //_recipes = recipeList.OrderBy(recipeNameOrder => recipeNameOrder.Name).ToList();      
-                        IEnumerable<IRecipe> recipeOrder = recipeList.OrderBy(recipeNameOrder => recipeNameOrder.Name).ToList();
+                        recipeList.TrimExcess();       // Rensar bort överflödiga platser i arrayen
+                                                                        
+                        //_recipes = recipeList.OrderBy(recipeNameOrder => recipeNameOrder.Name).ToList(); 
+     
+                                                                        // 4. Ska sortera listan efter receptens namn
+                        IEnumerable<IRecipe> recipeOrder = recipeList.OrderBy(recipeNameOrder => recipeNameOrder.Name);
                         _recipes = new List<IRecipe>(recipeOrder);      // 5. Tilldelar _recipes en referens till den sorterade listan
                         IsModified = false;                             // 6. Visar klassen att listan är oförändrad
                         OnRecipesChanged(EventArgs.Empty);              // 7. Utlöser en händelse om receptet har lästs in
 
-                        Console.WriteLine(line);
+                        // Testutskrift
+                        //Console.WriteLine(line);
+
                          
                     }
                 }
@@ -265,10 +271,19 @@ namespace FiledRecipes.Domain
         }
 
         // Spara recept
-        public virtual void Save()
+        public void Save()
         {
-            throw new NotImplementedException();
+             try
+            {
+                using (StreamWriter writer = new StreamWriter(@"App_Data/Recipes.txt"))
+                {
+                    throw new NotImplementedException();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("FEL!\n{0} ", ex.Message);
+            }
         }
-
     }
 }

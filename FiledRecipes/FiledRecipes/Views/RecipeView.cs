@@ -15,7 +15,9 @@ namespace FiledRecipes.Views
         // Visa recept
         public void Show(IRecipe recipe)
         {
-            throw new NotImplementedException();
+            Console.Clear();
+            Header = recipe.Name;   // Sätter metoden Header till receptets namn
+            ShowHeaderPanel();      // Skriver ut panelen där headern presenteras
         }
 
         // Visa alla recept
