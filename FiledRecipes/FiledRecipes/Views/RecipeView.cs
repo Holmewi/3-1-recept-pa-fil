@@ -19,6 +19,8 @@ namespace FiledRecipes.Views
             Header = recipe.Name;   // Sätter metoden Header till receptets namn
             ShowHeaderPanel();      // Skriver ut panelen där headern presenteras
 
+            Console.WriteLine("\nIngredienser\n");
+
             // För varje ingrediens (från interfacet IIngredient) i receptets del för ingredienser, som hämtas genom IRecipeView från IRecipe
             foreach (IIngredient ingredient in recipe.Ingredients)
             {
@@ -26,6 +28,8 @@ namespace FiledRecipes.Views
             }
 
             int instructionCount = 1;
+
+            Console.WriteLine("\nInstruktioner\n");
             // För varje sträng instruktion i receptets del för instruktioner, som hämtas genom IRecipeView från IRecipe
             foreach (string instruction in recipe.Instructions)
             {
@@ -39,7 +43,12 @@ namespace FiledRecipes.Views
         // Visa alla recept
         public void Show(IEnumerable<IRecipe> recipes)
         {
-            throw new NotImplementedException();
+            // För varje fullständigt recept i listan med recept
+            foreach (IRecipe recipe in recipes)
+            {
+                Show(recipe);               // Visar ett recept
+                ContinueOnKeyPressed();     // Visar nästa recept via knapptryckning
+            }
         }
     }
 }
