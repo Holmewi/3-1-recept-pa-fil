@@ -128,7 +128,6 @@ namespace FiledRecipes.Domain
             }
         }
 
-        // Virtual används för att modifiera metoden från det ärvda interfacet
         // Hämta recept
         public void Load()
         {
@@ -248,11 +247,12 @@ namespace FiledRecipes.Domain
 
                         recipeList.TrimExcess();       // Rensar bort överflödiga platser i arrayen
                                                                         
-                        //_recipes = recipeList.OrderBy(recipeNameOrder => recipeNameOrder.Name).ToList(); 
+                        
      
                                                                         // 4. Ska sortera listan efter receptens namn
-                        IEnumerable<IRecipe> recipeOrder = recipeList.OrderBy(recipeNameOrder => recipeNameOrder.Name);
-                        _recipes = new List<IRecipe>(recipeOrder);      // 5. Tilldelar _recipes en referens till den sorterade listan
+                        //IEnumerable<IRecipe> recipeOrder = recipeList.OrderBy(recipeNameOrder => recipeNameOrder.Name);
+                        //_recipes = new List<IRecipe>(recipeOrder);    // 5. Tilldelar _recipes en referens till den sorterade listan
+                        _recipes = recipeList.OrderBy(recipeNameOrder => recipeNameOrder.Name).ToList(); 
                         IsModified = false;                             // 6. Visar klassen att listan är oförändrad
                         OnRecipesChanged(EventArgs.Empty);              // 7. Utlöser en händelse om receptet har lästs in
 
@@ -273,11 +273,30 @@ namespace FiledRecipes.Domain
         // Spara recept
         public void Save()
         {
-             try
+            try
             {
                 using (StreamWriter writer = new StreamWriter(@"App_Data/Recipes.txt"))
                 {
-                    throw new NotImplementedException();
+
+                    foreach (Recipe recipe in _recipes)
+                    {
+                        writer.WriteLine(SectionRecipe);
+                        writer.WriteLine(recipe.Name);
+                        writer.WriteLine(SectionIngredients);
+                        foreach (Ingredient ingredient in recipe.Ingredients)
+                        {
+                            writer.WriteLine("{0};{1};{2}", ingredient.Amount, ingredient.Measure, ingredient.Name);
+                        }
+                        //writer.WriteLine(recipe.Ingredients);
+
+                        writer.WriteLine(SectionInstructions);
+                        foreach (string instruction in recipe.Instructions)
+                        {
+                            writer.WriteLine(instruction);
+                        }
+
+                    }
+
                 }
             }
             catch (Exception ex)
